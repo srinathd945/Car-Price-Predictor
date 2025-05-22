@@ -62,5 +62,31 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/flasktest-app:latest
 
-    - name: Image digest
-      run: echo ${{ steps.build-and-publish.outputs.digest }}
+      deploy-to-minikube:
+    needs: build-and-publish
+    runs-on: self-hosted
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Ensure Minikube is running
+      run: |
+        minikube status || minikube start --driver=docker
+
+    - name: Use Docker image in Minikube
+      run: |
+        minikube image load ${{ secrets.DOCKER_USERNAME }}/flasktest-app:latest
+
+    - name: Apply Kubernetes manifests
+      run: |
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/service.yaml
+
+    - name: Verify Deployment
+      run: |
+        kubectl rollout status deployment flask-app-deployment
