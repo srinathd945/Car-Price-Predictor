@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 
 # Load dataset and drop index if needed
-df = pd.read_csv("car data.csv", encoding="ISO-8859-1")
+df = pd.read_csv("data.csv", encoding="ISO-8859-1")
 
 # Map categorical variables to numeric
 df["Fuel_Type"] = df["Fuel_Type"].map({"Petrol": 0, "Diesel": 1, "CNG": 2})
