@@ -18,7 +18,7 @@ COPY model.py .
 RUN python3.8 model.py
 
 # Copy templates and Flask app
-COPY index.html templates
+COPY Index.html templates
 COPY result.html templates
 COPY flaskapp.py .
 
