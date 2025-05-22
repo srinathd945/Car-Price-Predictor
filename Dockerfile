@@ -11,16 +11,16 @@ RUN pip3 install -r requirement.txt
 RUN mkdir templates
 
 # Copy data and model training script
-COPY car data.csv .
+COPY data.csv .
 COPY model.py .
 
 # Run model training
 RUN python3.8 model.py
 
 # Copy templates and Flask app
-COPY templates/index.html templates
-COPY templates/result.html templates
+COPY index.html templates
+COPY result.html templates
 COPY flaskapp.py .
 
 # Run the Flask application
-ENTRYPOINT ["python3.8", "flaskapp.py"]
+ENTRYPOINT python3.8 flaskapp.py
