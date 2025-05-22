@@ -42,7 +42,7 @@ def predict():
 
     # Predict price
     prediction = model.predict(input_scaled)
-    formatted_prediction = f"The predicted selling price is ₹{round(float(prediction[0]), 2)}"
+    formatted_prediction = f"The predicted selling price (in lacs) is {round(float(prediction[0]), 2)}"
 
     return render_template("result.html", prediction=formatted_prediction)
 
