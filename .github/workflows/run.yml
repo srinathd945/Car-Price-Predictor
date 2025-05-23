@@ -61,31 +61,27 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/flasktest-app:latest
 
-  deploy-to-minikube:
-    needs: build-and-publish
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+ deploy-to-minikube:
+  needs: build-and-publish
+  runs-on: ubuntu-latest
+  steps:
+  - name: Checkout code
+    uses: actions/checkout@v4
 
-    - name: Set up kubectl
-      uses: azure/setup-kubectl@v3
-      with:
-        version: 'v1.29.0'  # Use specific version for reproducibility
+  - name: Set up kubectl
+    uses: azure/setup-kubectl@v3
+    with:
+      version: 'v1.29.0'
 
-    - name: Ensure Minikube is running
-      run: |
-        minikube status || minikube start --driver=docker
+  - name: Ensure Minikube is running
+    run: |
+      minikube status || minikube start --driver=docker
 
-    - name: Load Docker image into Minikube
-      run: |
-        minikube image load ${{ secrets.DOCKER_USERNAME }}/flasktest-app:latest
+  - name: Apply Kubernetes manifests
+    run: |
+      kubectl apply -f k8s/Deployment.yaml
+      kubectl apply -f k8s/Service.yaml
 
-    - name: Apply Kubernetes manifests
-      run: |
-        kubectl apply -f k8s/Deployment.yaml
-        kubectl apply -f k8s/Service.yaml
-
-    - name: Verify Deployment Rollout
-      run: |
-        kubectl rollout status deployment flask-app-deployment
+  - name: Verify Deployment Rollout
+    run: |
+      kubectl rollout status deployment flask-app-deployment
