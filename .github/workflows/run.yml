@@ -31,7 +31,7 @@ jobs:
 
   deploy-to-minikube:
     needs: build-and-test
-    runs-on: ubuntu-latest  # Your Minikube is running here
+    runs-on: [self-hosted, minikube-runner]  # Your Minikube is running here
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
