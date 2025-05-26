@@ -1,14 +1,23 @@
-name: CI/CD for Dockerized Flask App with Minikube
+name: CI/CD with Minikube Deployment
 
 on:
   push:
-    branches:
-      - dev
+    branches: [ dev ]
   pull_request:
-    branches:
-      - dev
+    branches: [ dev ]
 
 jobs:
+  dockerbuild:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set Docker env to Minikube
+        run: eval $(minikube docker-env)
+
+      - name: Build Docker image for Minikube
+        run: |
+          docker build . -t flask-dev-image:latest
 
   build-and-test:
     runs-on: ubuntu-latest
@@ -24,33 +33,25 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirement.txt
+          pip install -r requirements.txt
 
-     # - name: Run tests
-     #   run: pytest
+      - name: Run tests
+        run: pytest
 
   deploy-to-minikube:
-    needs: build-and-test
-    runs-on: [self-hosted, minikube-runner]  # Your Minikube is running here
+    needs: [dockerbuild, build-and-test]
+    runs-on: self-hosted
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'v1.28.0'
-
-      - name: Use Minikube Docker daemon
+      - name: Set kubectl context to Minikube
         run: |
-          eval $(minikube docker-env)
-          docker build -t flasktest-app:latest .
+          kubectl config use-context minikube
 
-      - name: Deploy to Minikube
+      - name: Apply Kubernetes manifests
         run: |
-          kubectl apply -f k8s/Deployment.yaml
-          kubectl apply -f k8s/Service.yaml
+          kubectl apply -f k8s/deployment.yaml
 
-      - name: Continuous Monitoring - Verify Deployment Rollout
+      - name: Wait for Deployment to become ready
         run: |
-          kubectl rollout status deployment flask-app
+          kubectl rollout status deployment/flask-app
