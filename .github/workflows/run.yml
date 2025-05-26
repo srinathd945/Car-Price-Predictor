@@ -8,36 +8,57 @@ on:
 
 jobs:
   dockerbuild:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set Docker env to Minikube
-        run: eval $(minikube docker-env)
-
-      - name: Build Docker image for Minikube
-        run: |
-          docker build . -t flask-dev-image:latest
-
+    - uses: actions/checkout@v4
+    - name: Build The Docker Image
+      run: |
+        docker build .  --tag workflow-test:$(date +%s)
+        docker run workflow-test:$(date +%s)
   build-and-test:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirement.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flask
+        pip install pytest
+  build-and-publish:
+    needs: build-and-test
+    runs-on: ubuntu-latest
 
-      - name: Run tests
-        run: pytest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/flasktest-app:latest
+
+    - name: Image digest
+      run: echo ${{ steps.build-and-publish.outputs.digest }}
   deploy-to-minikube:
     needs: [dockerbuild, build-and-test]
     runs-on: self-hosted
