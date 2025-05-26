@@ -8,7 +8,7 @@ on:
 
 jobs:
   dockerbuild:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -54,4 +54,4 @@ jobs:
 
       - name: Wait for Deployment to become ready
         run: |
-          kubectl rollout status deployment/flask-app
+          kubectl rollout status Deployment/flask-app
