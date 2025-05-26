@@ -52,7 +52,7 @@ jobs:
       run: echo ${{ steps.build-and-publish.outputs.digest }}
   deploy-to-minikube:
     needs: [build-and-test]
-    runs-on: ubuntu-latest
+    runs-on: self-hosted runner
     steps:
       - uses: actions/checkout@v4
 
@@ -62,7 +62,7 @@ jobs:
 
       - name: Apply Kubernetes manifests
         run: |
-          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/Deployment.yaml
 
       - name: Wait for Deployment to become ready
         run: |
