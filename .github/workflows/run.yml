@@ -66,4 +66,4 @@ jobs:
 
       - name: Wait for Deployment to become ready
         run: |
-          kubectl rollout status Deployment/flask-app
+          kubectl rollout status Deployment/flask-app-deployment
