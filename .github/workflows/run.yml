@@ -51,7 +51,7 @@ jobs:
     - name: Image digest
       run: echo ${{ steps.build-and-publish.outputs.digest }}
   deploy-to-minikube:
-    needs: [dockerbuild, build-and-test]
+    needs: [build-and-test]
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
