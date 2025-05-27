@@ -24,6 +24,9 @@ jobs:
           pip install -r requirement.txt   # fixed from requirement.txt
 
       - name: Run tests with pytest
+        working-directory: ${{ github.workspace }}
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           pip install pytest
-          PYTHONPATH=$PWD pytest
+          pytest tests/
