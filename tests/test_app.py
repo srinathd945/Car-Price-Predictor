@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import pytest
 from app import app
 
@@ -8,15 +12,11 @@ def client():
         yield client
 
 def test_home_page(client):
-    """Test if home page loads successfully"""
     response = client.get('/')
     assert response.status_code == 200
-    assert b'form' in response.data.lower()  # crude check for form presence
+    assert b'form' in response.data.lower()
 
 def test_prediction(client, monkeypatch):
-    """Test prediction route with mock form data"""
-
-    # Monkeypatch the model and scaler
     class MockModel:
         def predict(self, X):
             return [2.5]
