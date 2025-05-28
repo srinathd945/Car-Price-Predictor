@@ -64,8 +64,8 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply --validate=false -f k8s/dev-deployment.yaml
+          kubectl apply --validate=false -f k8s/main-deployment.yaml
 
       - name: Wait for deployment rollout
         run: |
-          kubectl rollout status deployment/flask-app-deployment -n dev
+          kubectl rollout status deployment/flask-app-deployment -n main
