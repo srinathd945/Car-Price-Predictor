@@ -2,23 +2,29 @@ import pytest
 
 @pytest.fixture
 def client(monkeypatch):
-    # Mock model and scaler before importing flaskapp
-    class MockModel:
+    # Dummy classes to simulate your model and scaler
+    class DummyModel:
         def predict(self, X):
             return [2.5]
 
-    class MockScaler:
+    class DummyScaler:
         def transform(self, X):
             return X
 
-    monkeypatch.setattr("flaskapp.model", MockModel())
-    monkeypatch.setattr("flaskapp.scaler", MockScaler())
+    # This list helps us return DummyModel first, then DummyScaler
+    dummy_objects = [DummyModel(), DummyScaler()]
 
-    # Now import flaskapp after mocking
-    from flaskapp import app
+    def fake_pickle_load(file):
+        return dummy_objects.pop(0)
 
-    app.config['TESTING'] = True
-    with app.test_client() as client:
+    # Patch pickle.load before importing flaskapp
+    monkeypatch.setattr("pickle.load", fake_pickle_load)
+
+    # Now import flaskapp after patching pickle.load
+    import flaskapp
+    flaskapp.app.config['TESTING'] = True
+
+    with flaskapp.app.test_client() as client:
         yield client
 
 def test_home_page(client):
@@ -36,6 +42,5 @@ def test_prediction(client):
         'transmission': 'Manual',
         'owner': 0
     })
-
     assert response.status_code == 200
     assert b"The predicted selling price" in response.data
