@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: flask-app-deployment
-  namespace: dev
+  namespace: main
 spec:
   replicas: 1
   selector:
@@ -43,7 +43,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: flask-service
-  namespace: dev
+  namespace: main
 spec:
   type: NodePort
   selector:
