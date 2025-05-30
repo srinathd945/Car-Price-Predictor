@@ -23,4 +23,4 @@ COPY result.html templates
 COPY flaskapp.py .
 
 # Run the Flask application
-ENTRYPOINT python3.8 flaskapp.py
+ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:5000", "flaskapp:app"]
