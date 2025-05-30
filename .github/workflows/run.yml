@@ -28,5 +28,4 @@ jobs:
         env:
           PYTHONPATH: ${{ github.workspace }}
         run: |
-          pytest tests/
-          
+          pytest tests/       
