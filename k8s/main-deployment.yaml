@@ -45,11 +45,10 @@ metadata:
   name: flask-service
   namespace: main
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: flask-app
   ports:
     - protocol: TCP
       port: 80
       targetPort: 5000
-      nodePort: 30036
